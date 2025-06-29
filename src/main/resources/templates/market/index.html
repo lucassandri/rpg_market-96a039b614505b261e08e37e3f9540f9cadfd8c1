@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Praça do Mercado - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Banner de boas-vindas -->
+        <div class="welcome-banner p-4 mb-4 text-center rounded border-gold">
+            <h1 class="display-5 fw-bold rpg-font">Bem-vindo à Praça do Mercado</h1>
+            <p class="lead">Encontre os melhores artefatos mágicos e equipamentos para suas aventuras!</p>
+            <div class="mt-3">
+                <a th:href="@{/item/novo}" sec:authorize="isAuthenticated()" class="btn btn-gold btn-lg">
+                    <i class="fas fa-scroll me-2"></i>Anunciar Item
+                </a>
+                <a th:href="@{/aventureiro/registrar}" sec:authorize="!isAuthenticated()" class="btn btn-gold btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Registrar-se                </a>
+            </div>
+        </div>
+        
+        <!-- Alerta sobre restrições de classe -->
+        <div sec:authorize="isAuthenticated()" class="alert alert-info bg-light border-gold mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-scroll me-3 fa-2x text-gold"></i>
+                <div>
+                    <h5 class="rpg-font mb-1">Aviso do Mestre</h5>
+                    <p class="mb-0">Como aventureiro, você só consegue ver os itens permitidos para sua classe. Os mercadores limitam o acesso a certas categorias com base em sua profissão!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="market-section mb-5">
+            <h2 class="rpg-font section-title">
+                <i class="fas fa-tags me-2"></i>Guildas & Mercadores
+            </h2>
+            <div class="row g-3 categories-grid">
+                <div class="col-6 col-md-3 col-lg-2" th:each="category : ${categories}">
+                    <a th:href="@{/mercado/categoria/{category}(category=${category})}" class="text-decoration-none">
+                        <div class="card h-100 category-card">
+                            <div class="card-body text-center p-3">
+                                <div class="category-icon mb-2">
+                                    <i class="fas" th:classappend="${
+                                        category.name() == 'ARMAS' ? 'fa-sword' : 
+                                        (category.name() == 'ARMADURA_VESTIMENTA' ? 'fa-shield-alt' : 
+                                        (category.name() == 'POCOES_ELIXIRES' ? 'fa-flask' : 
+                                        (category.name() == 'PERGAMINHOS_LIVROS' ? 'fa-book-open' : 
+                                        (category.name() == 'JOIAS_ARTEFATOS' ? 'fa-gem' : 
+                                        (category.name() == 'MONTARIAS_BESTAS' ? 'fa-horse' : 
+                                        (category.name() == 'RELIQUIAS_TECNOLOGICAS' ? 'fa-cog' : 'fa-box'
+                                        ))))))
+                                    }"></i>
+                                </div>
+                                <h5 class="card-title mb-0 small" th:text="${category.displayName}">Nome da Categoria</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>            </div>
+        </div>
+        
+        <div class="market-section mb-5">            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="rpg-font section-title mb-0">
+                    <i class="fas fa-scroll me-2"></i>Anúncios Recentes
+                </h2>
+                <div>
+                    <a th:href="@{/item/novo?type=DIRECT_SALE}" sec:authorize="isAuthenticated()" class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="fas fa-plus me-1"></i>Anunciar
+                    </a>
+                </div>
+            </div>
+            <div class="bulletin-board p-3">
+                <div class="row g-4 product-grid">
+                    <th:block th:each="product : ${products}">
+                        <div th:replace="~{fragments/product-cards :: direct-sale-card(${product})}"></div>
+                    </th:block>
+                </div>
+                <div th:if="${#lists.isEmpty(products)}" class="text-center py-4">
+                    <p class="text-muted">Nenhum item disponível para venda no momento.</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a th:href="@{/mercado/vendas-diretas}" class="btn btn-gold">
+                    <i class="fas fa-store me-2"></i>Ver Todos os Itens à Venda
+                </a>            </div>
+        </div>
+          <div class="market-section mb-5" th:if="${not #lists.isEmpty(auctions)}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="rpg-font section-title mb-0">
+                    <i class="fas fa-gavel me-2"></i>Leilões da Taverna
+                </h2>
+                <div>
+                    <a th:href="@{/item/novo?type=AUCTION}" sec:authorize="isAuthenticated()" class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="fas fa-plus me-1"></i>Anunciar
+                    </a>
+                </div>
+            </div>
+            <div class="auction-area p-3">
+                <div class="row g-4">
+                    <th:block th:each="auction : ${auctions}">
+                        <div th:replace="~{fragments/product-cards :: auction-card(${auction})}"></div>
+                    </th:block>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a th:href="@{/mercado/masmorra-dos-leiloes}" class="btn btn-gold">
+                    <i class="fas fa-gavel me-2"></i>Ver Todos os Leilões
+                </a>
+            </div>
+        </div>
+        
+        <div class="market-section">
+            <h2 class="rpg-font section-title">
+                <i class="fas fa-map-signs me-2"></i>Quadro de Avisos
+            </h2>
+            <div class="row g-4">
+                <div class="col-md-4" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/aventureiro/inventario}" class="text-decoration-none">
+                        <div class="card h-100 notice-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-box-open fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Meu Inventário</h4>
+                                <p class="mb-0 mt-2">Gerencie seus itens e vendas!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="text-decoration-none">
+                        <div class="card h-100 notice-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-sign-in-alt fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Entrar</h4>
+                                <p class="mb-0 mt-2">Faça login para comprar e vender!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a th:href="@{/mercado/masmorra-dos-leiloes}" class="text-decoration-none">
+                        <div class="card h-100 notice-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-gavel fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Leilões</h4>
+                                <p class="mb-0 mt-2">Participe de leilões emocionantes!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="pageScripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const countdowns = document.querySelectorAll('.countdown');
+                
+                function updateCountdowns() {
+                    countdowns.forEach(element => {
+                        const dateStr = element.getAttribute('data-end-date');
+                        if (!dateStr) return;
+                        
+                        const endDate = new Date(dateStr);
+                        const now = new Date();
+                        const diff = endDate - now;
+                        
+                        if (diff <= 0) {
+                            element.textContent = "Encerrado";
+                            return;
+                        }
+                        
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                          let displayText = "";
+                        if(days > 0) displayText += days + "d ";
+                        displayText += hours + "h " + minutes + "m";
+                        
+                        element.textContent = displayText;
+                    });
+                }
+                
+                updateCountdowns();
+                setInterval(updateCountdowns, 60000);
+            });            
+            function openImageModal(imgElement) {
+                if (imgElement.src.includes('default-product.jpg')) {
+                    return;
+                }
+                
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                  modal.style.display = 'block';
+                modalImg.src = imgElement.getAttribute('data-full-image') || imgElement.src;
+                
+                modal.onclick = function(event) {
+                    if (event.target === modal) {
+                        closeImageModal();
+                    }
+                }
+            }            
+            function closeImageModal() {
+                document.getElementById('imageModal').style.display = 'none';
+            }
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeImageModal();
+                }
+            });        </script>
+        
+        <div id="imageModal" class="image-modal">
+            <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+            <div class="image-modal-content">
+                <img id="modalImage" src="" alt="Imagem do Produto">
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

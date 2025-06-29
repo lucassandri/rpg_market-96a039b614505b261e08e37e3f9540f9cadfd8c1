@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Meu Perfil - RPG Market</title>
+    <link th:href="@{/css/mestre.css}" rel="stylesheet">
+</head>
+<body>    <div layout:fragment="content">        <!-- Banner especial para mestres -->
+        <div th:if="${user.role.name() == 'ROLE_MESTRE'}" class="banner-mestre alert mb-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-mestre me-3" style="font-size: 3rem;">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div>
+                    <h4 class="alert-heading mb-2" style="color: #2C1810; font-weight: bold; font-size: 1.8rem; text-shadow: 1px 1px 2px rgba(255,255,255,0.5);">
+                        🎭 Perfil de Mestre do Sistema
+                    </h4>
+                    <p class="mb-2" style="color: #2C1810; font-size: 1.1rem; font-weight: 600;">
+                        Você possui privilégios administrativos especiais no RPG Market.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/mestre/dashboard}" class="btn btn-mestre btn-sm fw-bold">
+                            <i class="fas fa-chart-line me-1"></i>Painel do Mestre
+                        </a>
+                        <a th:href="@{/mestre/ranking-nobres}" class="btn btn-outline-mestre btn-sm">
+                            <i class="fas fa-crown me-1"></i>Ranking Detalhado
+                        </a>
+                        <a th:href="@{/mestre/relatorio-atividades}" class="btn btn-outline-mestre btn-sm">
+                            <i class="fas fa-scroll me-1"></i>Relatórios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conteúdo da página de perfil -->        <h1 class="rpg-font mb-4">
+            <i class="fas fa-user-circle me-2"></i>Meu Perfil
+            <span th:if="${user.role.name() == 'ROLE_MESTRE'}" class="badge-mestre badge ms-2">
+                <i class="fas fa-shield-alt me-1"></i>MESTRE
+            </span>
+        </h1>
+        
+        <div class="row">            <div class="col-lg-4 mb-4">
+                <div class="card h-100" th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'card-mestre' : 'border-gold'">
+                    <div class="card-header text-light" th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'card-header-mestre' : 'bg-dark'">
+                        <h3 class="rpg-font mb-0">
+                            <i th:class="${user.role.name() == 'ROLE_MESTRE'} ? 'fas fa-crown me-2 icon-mestre' : 'fas fa-user me-2'"></i>
+                            <span th:text="${user.role.name() == 'ROLE_MESTRE'} ? 'Perfil do Mestre' : 'Perfil do Aventureiro'">Perfil do Aventureiro</span>
+                        </h3>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div class="avatar-container text-center mb-4">                                <img th:if="${user.profileImageUrl}" 
+                                     th:src="@{/images/{name}(name=${user.profileImageUrl})}" 
+                                     class="avatar-image rounded-circle" 
+                                     th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'avatar-mestre' : ''"
+                                     alt="Imagem de Perfil"
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                                <img th:unless="${user.profileImageUrl}" 
+                                     th:src="@{/static/images/default-avatar.png}" 
+                                     class="avatar-image rounded-circle" 
+                                     th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'avatar-mestre' : ''"
+                                     alt="Imagem de Perfil"
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                            <h3 class="rpg-font" th:text="${user.username}">NomeDaJogadora</h3>
+                            <p class="mb-1">
+                                <i th:class="${
+                                    user.characterClass == 'Guerreiro' ? 'fas fa-sword me-2' : 
+                                    user.characterClass == 'Mago' ? 'fas fa-hat-wizard me-2' : 
+                                    user.characterClass == 'Clérigo' ? 'fas fa-pray me-2' : 
+                                    user.characterClass == 'Ladino' ? 'fas fa-mask me-2' : 
+                                    user.characterClass == 'Druida' ? 'fas fa-leaf me-2' : 
+                                    user.characterClass == 'Bardo' ? 'fas fa-guitar me-2' : 
+                                    user.characterClass == 'Paladino' ? 'fas fa-shield-alt me-2' : 
+                                    user.characterClass == 'Ranger' ? 'fas fa-bow-arrow me-2' : 
+                                    'fas fa-user me-2'}"></i>
+                                <span th:text="${user.characterClass}">Classe</span>
+                            </p>                            <div class="badge fs-6 mb-3" th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'badge-mestre' : 'bg-gold'">
+                                <i class="fas fa-star me-1"></i>Nível <span th:text="${user.level}">5</span>
+                                <span th:if="${user.role.name() == 'ROLE_MESTRE'}" class="ms-2">
+                                    <i class="fas fa-crown"></i> MESTRE
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress mb-3" style="height: 25px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 th:style="'width: ' + ${user.experience % 100} + '%'" 
+                                 th:attr="aria-valuenow=${user.experience % 100}" aria-valuemin="0" aria-valuemax="100">
+                                <span th:text="${user.experience % 100} + '/100 XP'">75/100 XP</span>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-0">
+                            <i class="fas fa-coins me-2 text-warning"></i>
+                            <strong th:text="${user.goldCoins} + ' moedas de ouro'">500 moedas de ouro</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8 mb-4">
+                <div class="card border-gold h-100">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Informações da Conta
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="profile-stat">
+                                    <h4 class="rpg-font">Dados Pessoais</h4>
+                                    <p class="mb-2"><strong>Email:</strong> <span th:text="${user.email}">email@exemplo.com</span></p>
+                                    <p class="mb-2"><strong>Membro desde:</strong> <span>01/01/2023</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="profile-stat">
+                                    <h4 class="rpg-font">Estatísticas</h4>
+                                    <p class="mb-2"><strong>Total de XP:</strong> <span th:text="${user.experience}">475</span></p>
+                                    <p class="mb-2"><strong>Para o próximo nível:</strong> <span th:text="${100 - (user.experience % 100)} + ' XP'">25 XP</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="profile-stat">
+                                    <h4 class="rpg-font">Histórico de Mercado</h4>
+                                    <p class="mb-2"><strong>Itens à venda:</strong> <span th:text="${#lists.size(activeItems)}">3</span></p>
+                                    <p class="mb-2"><strong>Itens vendidos:</strong> <span th:text="${#lists.size(soldItems)}">12</span></p>
+                                    <p class="mb-2"><strong>Compras realizadas:</strong> <span th:text="${#lists.size(userPurchases)}">8</span></p>
+                                </div>
+                            </div>                            <div class="col-md-6">
+                                <div class="profile-stat">
+                                    <h4 class="rpg-font">Links Rápidos</h4>
+                                    <!-- Links especiais para mestres -->
+                                    <ul th:if="${user.role.name() == 'ROLE_MESTRE'}" class="list-unstyled">
+                                        <li class="mb-2">
+                                            <a th:href="@{/mestre/dashboard}" class="text-decoration-none text-warning fw-bold">
+                                                <i class="fas fa-shield-alt me-2"></i>Painel do Mestre
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a th:href="@{/mestre/ranking-nobres}" class="text-decoration-none text-warning">
+                                                <i class="fas fa-crown me-2"></i>Ranking Detalhado
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a th:href="@{/mestre/relatorio-atividades}" class="text-decoration-none text-warning">
+                                                <i class="fas fa-scroll me-2"></i>Relatório de Atividades
+                                            </a>
+                                        </li>
+                                        <li><hr class="my-2"></li>
+                                    </ul>
+                                    <!-- Links normais -->
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <a th:href="@{/aventureiro/inventario}" class="text-decoration-none">
+                                                <i class="fas fa-box-open me-2"></i>Meu Inventário
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a th:href="@{/aventureiro/compras}" class="text-decoration-none">
+                                                <i class="fas fa-shopping-bag me-2"></i>Minhas Compras
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a th:href="@{/aventureiro/vendas}" class="text-decoration-none">
+                                                <i class="fas fa-coins me-2"></i>Minhas Vendas
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a th:href="@{/aventureiro/enderecos}" class="text-decoration-none">
+                                                <i class="fas fa-map-marker-alt me-2"></i>Meus Endereços
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-end">
+                            <a th:href="@{/aventureiro/senha}" class="btn btn-outline-dark me-2">
+                                <i class="fas fa-key me-2"></i>Alterar Senha
+                            </a>
+                            <a th:href="@{/aventureiro/editar-perfil}" class="btn btn-gold">
+                                <i class="fas fa-edit me-2"></i>Editar Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Achievement Section -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="card border-gold">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-trophy me-2"></i>Conquistas
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-6">
+                                <div class="achievement-card text-center p-3" th:classappend="${user.level >= 5 ? 'unlocked' : 'locked'}">
+                                    <div class="achievement-icon mb-2">
+                                        <i class="fas fa-crown fa-2x" th:classappend="${user.level >= 5 ? 'text-warning' : 'text-secondary'}"></i>
+                                    </div>
+                                    <h5 class="rpg-font">Aventureiro Experiente</h5>
+                                    <p class="small mb-0">Atingir nível 5</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="achievement-card text-center p-3" th:classappend="${#lists.size(soldItems) >= 5 ? 'unlocked' : 'locked'}">
+                                    <div class="achievement-icon mb-2">
+                                        <i class="fas fa-store fa-2x" th:classappend="${#lists.size(soldItems) >= 5 ? 'text-warning' : 'text-secondary'}"></i>
+                                    </div>
+                                    <h5 class="rpg-font">Mercador Iniciante</h5>
+                                    <p class="small mb-0">Vender 5 itens</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="achievement-card text-center p-3" th:classappend="${user.goldCoins >= 1000 ? 'unlocked' : 'locked'}">
+                                    <div class="achievement-icon mb-2">
+                                        <i class="fas fa-coins fa-2x" th:classappend="${user.goldCoins >= 1000 ? 'text-warning' : 'text-secondary'}"></i>
+                                    </div>
+                                    <h5 class="rpg-font">Bolsa Cheia</h5>
+                                    <p class="small mb-0">Acumular 1000 moedas</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="achievement-card text-center p-3 locked">
+                                    <div class="achievement-icon mb-2">
+                                        <i class="fas fa-dragon fa-2x text-secondary"></i>
+                                    </div>
+                                    <h5 class="rpg-font">???</h5>
+                                    <p class="small mb-0">Conquista misteriosa</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>        </div>
+    </div>
+</body>
+</html>

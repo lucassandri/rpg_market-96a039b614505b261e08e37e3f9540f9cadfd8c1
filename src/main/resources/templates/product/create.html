@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Criar Anúncio - RPG Market</title>
+      <th:block layout:fragment="styles">
+        <link th:href="@{/css/item-creation.css}" rel="stylesheet">
+        <style>
+            #directSaleFields, #auctionFields {
+                display: none;
+                transition: all 0.3s ease;
+            }
+        </style>
+    </th:block>
+</head>
+<body class="rpg-theme">
+    <div layout:fragment="content">
+        <main class="container py-4 flex-grow-1">
+            <!-- Pergaminho título -->
+            <div class="scroll-header mb-4">
+                <h1 class="rpg-font">
+                    <i class="fas fa-scroll me-2"></i>Anunciar Item
+                </h1>
+            </div>
+            
+            <!-- Alerts for feedback -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${success}">Sucesso!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span th:text="${error}">Erro!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <!-- Item Creation Form -->
+            <form th:action="@{/item/novo}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="row">
+                    <!-- Coluna esquerda - Informações básicas e preço -->
+                    <div class="col-md-8">
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-info-circle me-2"></i>Informações Básicas</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nome do Item</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe o nome do item.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Descrição</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                    <div class="invalid-feedback">
+                                        Por favor, descreva as características do item.
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="category" class="form-label">Categoria</label>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="" selected disabled>Selecione uma categoria</option>
+                                            <option th:each="categoryOption : ${categories}" 
+                                                    th:value="${categoryOption}" 
+                                                    th:text="${categoryOption.displayName}">Categoria</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor, selecione uma categoria.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="rarity" class="form-label">Raridade</label>
+                                        <select class="form-select" id="rarity" name="rarity" required>
+                                            <option value="" selected disabled>Selecione uma raridade</option>
+                                            <option th:each="rarityOption : ${rarities}" 
+                                                    th:value="${rarityOption}" 
+                                                    th:text="${rarityOption.displayName}">Raridade</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor, selecione a raridade do item.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-coins me-2"></i>Preço e Tipo</h3>
+                            </div>
+                            <div class="card-body">                                <div class="mb-3">
+                                    <label for="type" class="form-label">Tipo de Venda*</label>
+                                    <select class="form-select" id="type" name="type" required>
+                                        <option value="" th:selected="${product.type == null}" disabled>Selecione o tipo de venda</option>
+                                        <option value="DIRECT_SALE" th:selected="${product.type != null && product.type.name() == 'DIRECT_SALE'}">Venda Direta</option>
+                                        <option value="AUCTION" th:selected="${product.type != null && product.type.name() == 'AUCTION'}">Leilão</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Hidden price field that will always be submitted -->
+                                <input type="hidden" id="price" name="price" value="0">
+                                
+                                <!-- Direct Sale Fields -->
+                                <div id="directSaleFields">
+                                    <div class="mb-3">
+                                        <label for="directSalePrice" class="form-label">Preço (Moedas de Ouro)*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                            <input type="number" class="form-control" id="directSalePrice" name="directSalePrice" min="0.01" step="0.01" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Auction Fields -->
+                                <div id="auctionFields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="startingBid" class="form-label">Lance Inicial (Moedas de Ouro)*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                            <input type="number" class="form-control" id="startingBid" name="startingBid" min="0.01" step="0.01" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="minBidIncrement" class="form-label">Incremento Mínimo entre Lances</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-plus text-warning"></i></span>
+                                            <input type="number" class="form-control" id="minBidIncrement" name="minBidIncrement" min="0.01" step="0.01" value="1.00">
+                                        </div>
+                                        <div class="form-text">Valor mínimo a ser adicionado ao lance atual para um novo lance ser válido. Padrão: 1.00</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                            <input type="number" class="form-control" id="buyNowPrice" name="buyNowPrice" min="0" step="0.01">
+                                        </div>
+                                        <div class="form-text">Se definido, os usuários poderão encerrar o leilão comprando imediatamente pelo valor especificado.</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="auctionEndDate" class="form-label">Data de Término do Leilão</label>
+                                        <input type="datetime-local" class="form-control" id="auctionEndDate" name="auctionEndDate">
+                                        <div class="form-text">Se não definido, o leilão terminará em 7 dias.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coluna direita - Imagem e Preview -->
+                    <div class="col-md-4">
+                        <!-- Imagem -->
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-image me-2"></i>Imagem</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Imagem do Item</label>
+                                    <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                                </div>
+                                <div class="item-image-preview mt-3" id="imagePreview">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview do Card -->
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-eye me-2"></i>Preview do Anúncio</h3>
+                            </div>                            <div class="card-body">
+                                <div class="product-preview-card card h-100">
+                                    <div class="preview-img-container product-img-container">
+                                        <img id="previewCardImage" 
+                                             src="/images/default-product.jpg" 
+                                             class="preview-img product-img" 
+                                             alt="Preview do Produto">
+                                        
+                                        <span id="previewCategory" class="badge product-category-badge bg-dark">Categoria</span>
+                                        
+                                        <span id="previewType" class="badge bg-primary position-absolute start-0 top-0 m-2">Venda Direta</span>
+                                        
+                                        <span id="previewRarity" class="badge position-absolute end-0 m-2 bg-secondary" style="top: 45px !important; display: none;">Comum</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 id="previewName" class="card-title rpg-font">Nome do Item</h5>
+                                        <p id="previewDescription" class="card-text text-truncate">Descrição do item...</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span id="previewPrice" class="product-price">0,00 moedas</span>
+                                            <span class="btn btn-sm btn-gold">
+                                                <i class="fas fa-eye me-1"></i>Detalhes
+                                            </span>
+                                        </div>
+                                    </div>                                    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            <span>Seu usuário</span>
+                                        </small>
+                                        <small class="text-muted" id="previewDate">Hoje</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a th:href="@{/aventureiro/inventario}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" id="submitBtn" class="btn btn-gold" disabled>
+                        <i class="fas fa-scroll me-2"></i>Anunciar Item
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <th:block layout:fragment="pageScripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get DOM elements
+                const typeSelect = document.getElementById('type');
+                const directSaleFields = document.getElementById('directSaleFields');
+                const auctionFields = document.getElementById('auctionFields');
+                const priceField = document.getElementById('price');
+                const directSalePriceField = document.getElementById('directSalePrice');
+                const startingBidField = document.getElementById('startingBid');
+                const previewPrice = document.getElementById('previewPrice');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                // Função para inicializar o tipo se foi pré-selecionado
+                function initializePreselectedType() {
+                    if (typeSelect && typeSelect.value) {
+                        // Se há um valor pré-selecionado, habilita o botão e mostra os campos apropriados
+                        submitBtn.disabled = false;
+                        
+                        if (typeSelect.value === 'DIRECT_SALE') {
+                            directSaleFields.style.display = 'block';
+                            auctionFields.style.display = 'none';
+                            directSalePriceField.setAttribute('required', 'required');
+                            startingBidField.removeAttribute('required');
+                        } else if (typeSelect.value === 'AUCTION') {
+                            directSaleFields.style.display = 'none';
+                            auctionFields.style.display = 'block';
+                            startingBidField.setAttribute('required', 'required');
+                            directSalePriceField.removeAttribute('required');
+                        }
+                        
+                        updatePreviewFromFields();
+                    }
+                }
+                
+                // Chama a função de inicialização
+                initializePreselectedType();
+                  if (typeSelect && submitBtn) {
+                    typeSelect.addEventListener('change', function() {
+                        submitBtn.disabled = false;
+                        updatePreviewFromFields();
+                    });
+                }
+                  if (typeSelect) {
+                    typeSelect.addEventListener('change', function() {
+                        if (this.value === 'AUCTION') {
+                            directSaleFields.style.display = 'none';
+                            auctionFields.style.display = 'block';
+                            startingBidField.setAttribute('required', 'required');
+                            directSalePriceField.removeAttribute('required');
+                            
+                            if (startingBidField.value) {
+                                priceField.value = startingBidField.value;
+                                updatePricePreview(startingBidField.value);
+                            }
+                        } else if (this.value === 'DIRECT_SALE') {
+                            directSaleFields.style.display = 'block';
+                            auctionFields.style.display = 'none';
+                            directSalePriceField.setAttribute('required', 'required');
+                            startingBidField.removeAttribute('required');
+                            
+                            if (directSalePriceField.value) {
+                                priceField.value = directSalePriceField.value;
+                                updatePricePreview(directSalePriceField.value);
+                            }
+                        }
+                        updatePreviewFromFields(); // Atualizar preview
+                    });
+                }
+                  if (directSalePriceField) {
+                    directSalePriceField.addEventListener('input', function() {
+                        priceField.value = this.value;
+                        updatePricePreview(this.value);
+                        updatePreviewFromFields();
+                    });
+                }
+                  if (startingBidField) {
+                    startingBidField.addEventListener('input', function() {
+                        priceField.value = this.value;
+                        updatePricePreview(this.value);
+                        updatePreviewFromFields();
+                    });
+                }
+                
+                // Atualiza o preview do preço
+                function updatePricePreview(value) {
+                    if (previewPrice) {
+                        const price = parseFloat(value) || 0;
+                        const formattedPrice = price.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                        previewPrice.textContent = formattedPrice + ' moedas';
+                    }
+                }
+                // ===== SISTEMA DE PREVIEW DINÂMICO =====
+
+                function updatePreview() {
+                    // Atualizar imagem
+                    const imageInput = document.getElementById('image');
+                    const previewImage = document.getElementById('previewCardImage');
+                    const imagePreviewContainer = document.getElementById('imagePreview');
+                    
+                    if (imageInput && imageInput.files && imageInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Atualizar preview do card
+                            if (previewImage) {
+                                previewImage.src = e.target.result;
+                            }
+                            
+                            // Atualizar preview da área de upload
+                            if (imagePreviewContainer) {
+                                imagePreviewContainer.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 150px; object-fit: contain;">';
+                            }
+                        };
+                        reader.readAsDataURL(imageInput.files[0]);
+                    } else {
+                        // Resetar para imagem padrão
+                        if (previewImage) {
+                            previewImage.src = '/images/default-product.jpg';
+                        }
+                        if (imagePreviewContainer) {
+                            imagePreviewContainer.innerHTML = '<i class="fas fa-image fa-3x text-muted"></i>';
+                        }
+                    }
+                    
+                    updatePreviewFromFields();
+                }
+
+                function updatePreviewFromFields() {
+                    // Atualizar nome
+                    const nameField = document.getElementById('name');
+                    const previewName = document.getElementById('previewName');
+                    if (nameField && previewName) {
+                        const name = nameField.value || 'Nome do Item';
+                        previewName.textContent = name;
+                    }
+                    
+                    // Atualizar descrição
+                    const descriptionField = document.getElementById('description');
+                    const previewDescription = document.getElementById('previewDescription');
+                    if (descriptionField && previewDescription) {
+                        const description = descriptionField.value || 'Descrição do item...';
+                        const truncatedDesc = description.length > 50 ? description.substring(0, 50) + '...' : description;
+                        previewDescription.textContent = truncatedDesc;
+                    }
+                    
+                    // Atualizar categoria
+                    const categorySelect = document.getElementById('category');
+                    const previewCategory = document.getElementById('previewCategory');
+                    if (categorySelect && previewCategory) {
+                        const categoryText = categorySelect.options[categorySelect.selectedIndex]?.text || 'Categoria';
+                        previewCategory.textContent = categoryText;
+                    }
+                    
+                    // Atualizar raridade
+                    const raritySelect = document.getElementById('rarity');
+                    const rarityBadge = document.getElementById('previewRarity');
+                    if (raritySelect && rarityBadge) {
+                        if (raritySelect.value && raritySelect.selectedIndex > 0) {
+                            const rarityText = raritySelect.options[raritySelect.selectedIndex].text;
+                            const rarityValue = raritySelect.value;
+                            
+                            rarityBadge.textContent = rarityText;
+                            rarityBadge.style.display = 'inline-block';
+                            
+                            // Definir cor do badge baseado na raridade
+                            rarityBadge.className = 'badge position-absolute end-0 m-2 ';
+                            rarityBadge.style.top = '45px';
+                            
+                            switch(rarityValue) {
+                                case 'COMUM':
+                                    rarityBadge.className += 'bg-secondary';
+                                    break;
+                                case 'INCOMUM':
+                                    rarityBadge.className += 'bg-success';
+                                    break;
+                                case 'RARO':
+                                    rarityBadge.className += 'bg-primary';
+                                    break;
+                                case 'MUITO_RARO':
+                                    rarityBadge.className += 'bg-warning';
+                                    break;
+                                case 'LENDARIO':
+                                    rarityBadge.className += 'bg-danger';
+                                    break;
+                                case 'ARTEFATO':
+                                    rarityBadge.className += 'bg-gold';
+                                    break;
+                                default:
+                                    rarityBadge.className += 'bg-secondary';
+                            }
+                        } else {
+                            rarityBadge.style.display = 'none';
+                        }
+                    }
+                    
+                    // Atualizar tipo e ícone
+                    const typeElement = document.getElementById('previewType');
+                    if (typeSelect && typeElement) {
+                        const type = typeSelect.value;
+                        
+                        if (type === 'DIRECT_SALE') {
+                            typeElement.innerHTML = '<i class="fas fa-shopping-cart me-1"></i>Venda Direta';
+                            typeElement.className = 'badge bg-success position-absolute start-0 top-0 m-2';
+                        } else if (type === 'AUCTION') {
+                            typeElement.innerHTML = '<i class="fas fa-gavel me-1"></i>Leilão';
+                            typeElement.className = 'badge bg-danger position-absolute start-0 top-0 m-2';
+                        } else {
+                            typeElement.textContent = 'Selecione o tipo';
+                            typeElement.className = 'badge bg-secondary position-absolute start-0 top-0 m-2';
+                        }
+                    }
+                    
+                    // Atualizar preço
+                    const previewPriceElement = document.getElementById('previewPrice');
+                    if (previewPriceElement) {
+                        let price = 0;
+                        if (typeSelect.value === 'DIRECT_SALE' && directSalePriceField.value) {
+                            price = parseFloat(directSalePriceField.value);
+                        } else if (typeSelect.value === 'AUCTION' && startingBidField.value) {
+                            price = parseFloat(startingBidField.value);
+                        }
+                        
+                        const formattedPrice = price > 0 ? price.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }) : '0,00';
+                        previewPriceElement.textContent = formattedPrice + ' moedas';
+                    }
+                    
+                    // Atualizar data para hoje
+                    const previewDate = document.getElementById('previewDate');
+                    if (previewDate) {
+                        const today = new Date().toLocaleDateString('pt-BR');
+                        previewDate.textContent = today;
+                    }
+                }
+
+                // Adicionar listeners para atualização automática do preview
+                const fields = ['name', 'description', 'category', 'rarity', 'directSalePrice', 'startingBid'];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', updatePreviewFromFields);
+                        field.addEventListener('change', updatePreviewFromFields);
+                    }
+                });
+                
+                // Listener especial para o tipo
+                if (typeSelect) {
+                    typeSelect.addEventListener('change', updatePreviewFromFields);
+                }
+                
+                // Listener para upload de imagem
+                const imageInput = document.getElementById('image');
+                if (imageInput) {
+                    imageInput.addEventListener('change', updatePreview);
+                }
+                
+                // Validação adicional no envio do formulário
+                const form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const selectedType = typeSelect.value;
+                        
+                        if (selectedType === 'AUCTION') {
+                            if (startingBidField.value) {
+                                priceField.value = startingBidField.value;
+                            } else {
+                                alert("Por favor, informe um lance inicial válido.");
+                                startingBidField.focus();
+                                return;
+                            }
+                        } else if (selectedType === 'DIRECT_SALE') {
+                            if (directSalePriceField.value) {
+                                priceField.value = directSalePriceField.value;
+                            } else {
+                                alert("Por favor, informe um preço válido.");
+                                directSalePriceField.focus();
+                                return;
+                            }
+                        }
+                        
+                        if (!priceField.value || parseFloat(priceField.value) <= 0) {
+                            alert("Erro: O preço não foi definido corretamente. Por favor, tente novamente.");
+                            return;
+                        }
+                        
+                        form.submit();
+                    });
+                }
+                
+                // Atualizar preview inicial
+                updatePreviewFromFields();
+            });
+        </script>
+    </th:block>
+</body>
+</html>

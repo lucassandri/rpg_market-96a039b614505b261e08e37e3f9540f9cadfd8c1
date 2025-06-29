@@ -1,0 +1,353 @@
+/* Market-specific styles */
+.market-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+/* Category cards */
+.category-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #d2b48c;
+    background: linear-gradient(to bottom, #f7f3e3, #e8d8b5);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-color: var(--secondary-color);
+}
+
+.category-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+}
+
+/* Category specific icons */
+.category-icon .fas.fa-box-open {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+[href*="ARMADURA_VESTIMENTA"] .category-icon i {
+    color: #8b4513;
+}
+
+[href*="ARMAS"] .category-icon i:before {
+    content: "\f6de"; /* fa-swords */
+    color: #696969;
+}
+
+[href*="POCOES_ELIXIRES"] .category-icon i:before {
+    content: "\f0c3"; /* fa-flask */
+    color: #ff7f50;
+}
+
+[href*="PERGAMINHOS_LIVROS"] .category-icon i:before {
+    content: "\f518"; /* fa-scroll */
+    color: #bdb76b;
+}
+
+[href*="JOIAS_ARTEFATOS"] .category-icon i:before {
+    content: "\f3a5"; /* fa-gem */
+    color: #9370db;
+}
+
+/* Special icon classes for categories */
+.fas.fa-sword:before {
+    content: "\f71b"; /* This is fa-sword but fallback to another icon */
+}
+
+/* Inventory page specific styles */
+.inventory-empty {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.inventory-empty i {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.empty-inventory-container {
+    background-image: url('../images/bg-default.png');
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Medieval bulletin board style */
+.bulletin-board {
+    background-color: #f5e7c1;
+    border: 15px solid #8b5a2b;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    padding: 20px;
+}
+
+.auction-area {
+    background-color: #eadec0;
+    border: 15px solid #6d4423;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    padding: 20px;
+}
+
+.welcome-banner {
+    background-image: url('../images/bg-default.png');
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.market-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 2px solid #d2b48c;
+    transform: rotate(0deg);
+}
+
+.market-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.auction-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 2px solid #c19a6b;
+    transform: rotate(0deg);
+}
+
+.auction-item:hover {
+    transform: translateY(-5px) rotate(1deg);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.auction-timer {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    font-size: 0.9rem;
+}
+
+.notice-card {
+    border: 2px solid var(--secondary-color);
+    background: linear-gradient(to bottom, #f8f4e3, #eae0c9);
+    transition: all 0.3s ease;
+}
+
+.notice-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-card {
+    transition: all 0.3s ease;
+    border: 2px solid #d2b48c;
+    transform: rotate(0deg);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border-color: var(--secondary-color);
+}
+
+/* Tabs styling */
+.nav-tabs .nav-link {
+    color: #555;
+    border-bottom: none;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-color: var(--secondary-color) var(--secondary-color) #fff;
+    font-weight: bold;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    border-color: #f0f0f0 #f0f0f0 #dee2e6;
+    background-color: #f9f9f9;
+}
+
+/* Responsiveness adjustments */
+@media (max-width: 768px) {
+    .bulletin-board, .auction-area {
+        border-width: 10px;
+        padding: 15px;
+    }
+}
+
+/* Market grid responsiveness */
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* Filtros responsivos */
+.filter-sidebar {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsividade para grid de produtos */
+@media (max-width: 1199px) {
+    .market-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 991px) {
+    .market-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .category-card {
+        margin-bottom: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .market-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+    }
+    
+    /* Ajuste para filtros em mobile */
+    .filter-sidebar {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-sidebar .card-title {
+        font-size: 1rem;
+    }
+    
+    /* Reduzir o espaço entre categorias */
+    .category-card {
+        padding: 0.75rem;
+    }
+    
+    .category-icon {
+        font-size: 1.5rem;
+    }
+    
+    .category-title {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 575px) {
+    /* Grid em smartphones */
+    .market-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    /* Reduz espaçamento em telas pequenas */
+    .market-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Filtros em mobile */
+    .filter-sidebar .form-group {
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-sidebar label {
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    /* Navegação de paginação menor */
+    .pagination .page-link {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.65rem;
+    }
+}
+
+/* Layout responsivo para filtros e resultados */
+@media (min-width: 992px) {
+    .market-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .filter-column {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+    
+    .results-column {
+        flex: 0 0 75%;
+        max-width: 75%;
+        padding-left: 1.5rem;
+    }
+}
+
+/* Botões de filtro responsivos para mobile */
+@media (max-width: 991px) {
+    .filter-toggle-btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-sidebar {
+        margin-bottom: 1rem;
+        transition: max-height 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .filter-sidebar.collapsed {
+        max-height: 0;
+    }
+}

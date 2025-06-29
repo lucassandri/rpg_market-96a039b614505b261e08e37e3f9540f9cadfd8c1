@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Masmorra dos Leilões - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-gavel me-2"></i>Masmorra dos Leilões
+            </h1>
+            <div>
+                <a th:href="@{/mercado}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Mercado
+                </a>
+            </div>
+        </div>
+        
+        <!-- Filtros e Ordenação -->
+        <div class="card border-gold mb-4">
+            <div class="card-header bg-dark text-light">
+                <h3 class="rpg-font mb-0">
+                    <i class="fas fa-filter me-2"></i>Filtros e Ordenação
+                </h3>
+            </div>
+            <div class="card-body">                <form th:action="@{/mercado/masmorra-dos-leiloes}" method="get" class="row g-3">
+                    
+                    <div class="col-md-3 col-sm-6">
+                        <label for="category" class="form-label">Categoria</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">Todas as Categorias</option>
+                            <option th:each="categoryOption : ${categories}" 
+                                    th:value="${categoryOption}" 
+                                    th:text="${categoryOption.displayName}"
+                                    th:selected="${param.category != null && param.category[0] == categoryOption.name()}">
+                                Categoria
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por raridade -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="rarity" class="form-label">Raridade</label>
+                        <select class="form-select" id="rarity" name="rarity">
+                            <option value="">Todas as Raridades</option>
+                            <option th:each="rarityOption : ${rarities}" 
+                                    th:value="${rarityOption}" 
+                                    th:text="${rarityOption.displayName}"
+                                    th:selected="${param.rarity != null && param.rarity[0] == rarityOption.name()}">
+                                Raridade
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por faixa de preço -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="minPrice" class="form-label">Lance Mínimo</label>
+                        <input type="number" class="form-control" id="minPrice" name="minPrice" 
+                               th:value="${param.minPrice}" min="0" step="0.01" placeholder="Min">
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6">
+                        <label for="maxPrice" class="form-label">Lance Máximo</label>
+                        <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
+                               th:value="${param.maxPrice}" min="0" step="0.01" placeholder="Max">
+                    </div>
+                    
+                    <!-- Checkbox para leilões terminando em breve -->
+                    <div class="col-md-4">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="endingSoon" name="endingSoon" value="true"
+                                  th:checked="${param.endingSoon != null && param.endingSoon[0] == 'true'}">
+                            <label class="form-check-label" for="endingSoon">
+                                <i class="fas fa-hourglass-end me-1"></i>Apenas leilões terminando em breve (24h)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ordenação -->
+                    <div class="col-md-8">
+                        <label for="sort" class="form-label">Ordenar por</label>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="auctionEndDate,asc" th:selected="${param.sort == null || param.sort[0] == 'auctionEndDate,asc'}">Terminando em breve</option>
+                                <option value="auctionEndDate,desc" th:selected="${param.sort != null && param.sort[0] == 'auctionEndDate,desc'}">Terminando depois</option>
+                                <option value="price,asc" th:selected="${param.sort != null && param.sort[0] == 'price,asc'}">Lance atual: menor primeiro</option>
+                                <option value="price,desc" th:selected="${param.sort != null && param.sort[0] == 'price,desc'}">Lance atual: maior primeiro</option>
+                                <option value="createdAt,desc" th:selected="${param.sort != null && param.sort[0] == 'createdAt,desc'}">Mais recentes primeiro</option>
+                                <option value="createdAt,asc" th:selected="${param.sort != null && param.sort[0] == 'createdAt,asc'}">Mais antigos primeiro</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-gold">
+                                <i class="fas fa-search me-2"></i>Aplicar
+                            </button>
+                            
+                            <a th:href="@{/mercado/masmorra-dos-leiloes}" class="btn btn-outline-secondary">
+                                <i class="fas fa-sync-alt me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Lista de Produtos -->
+        <div class="row g-4">
+            <!-- Se não houver produtos -->
+            <div th:if="${auctions.empty}" class="col-12 inventory-empty">
+                <i class="fas fa-gavel mb-3"></i>
+                <h4>Não há leilões ativos com estes filtros</h4>
+                <p class="text-muted">Tente outros critérios de busca ou visite mais tarde!</p>
+                <a th:href="@{/mercado/masmorra-dos-leiloes}" class="btn btn-gold mt-2">
+                    <i class="fas fa-search me-2"></i>Ver Todos os Leilões
+                </a>
+            </div>            
+            <th:block th:unless="${auctions.empty}" th:each="auction : ${auctions}">
+                <div th:replace="~{fragments/product-cards :: auction-card-no-badge(${auction})}"></div>
+            </th:block>
+        </div>
+        
+        <div th:if="${auctions.totalPages > 1}" class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li th:class="${auctions.first ? 'page-item disabled' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number - 1},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, auctions.totalPages - 1)}" 
+                        th:class="${auctions.number == i ? 'page-item active' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${i},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li th:class="${auctions.last ? 'page-item disabled' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number + 1},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+      <th:block layout:fragment="pageScripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Garantir que os countdowns sejam atualizados imediatamente e a cada segundo
+                updateAllCountdowns();
+                setInterval(updateAllCountdowns, 1000);
+            });
+            
+            // ===== SISTEMA DE MODAL DE IMAGENS =====
+            function openImageModal(imgElement) {
+                // Não abrir modal para imagem padrão
+                if (imgElement.src.includes('default-product.jpg')) {
+                    return;
+                }
+                
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                
+                modal.style.display = 'block';
+                modalImg.src = imgElement.getAttribute('data-full-image') || imgElement.src;
+                
+                // Fechar modal ao clicar fora da imagem
+                modal.onclick = function(event) {
+                    if (event.target === modal) {
+                        closeImageModal();
+                    }
+                }
+            }
+            
+            function closeImageModal() {
+                document.getElementById('imageModal').style.display = 'none';
+            }
+            
+            // Fechar modal com ESC
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeImageModal();
+                }
+            });        </script>
+        
+        <div id="imageModal" class="image-modal">
+            <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+            <div class="image-modal-content">
+                <img id="modalImage" src="" alt="Imagem do Produto">
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>
