@@ -1,4 +1,4 @@
-/* Bid Page Responsive Styles */
+/* Estilos Responsivos da Página de Lances */
 
 :root {
     --primary-blue: #2563eb;
@@ -18,7 +18,7 @@
     --radius: 0.75rem;
 }
 
-/* Modern Container */
+/* Container Moderno */
 .bid-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -31,7 +31,7 @@
     }
 }
 
-/* Header Section */
+/* Seção do Cabeçalho */
 .bid-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -53,7 +53,7 @@
     opacity: 0.9;
 }
 
-/* Cards */
+/* Cartões */
 .bid-card {
     background: var(--white-bg);
     border-radius: var(--radius);
@@ -74,7 +74,7 @@
     padding: 1.5rem;
 }
 
-/* Auction Timer */
+/* Temporizador do Leilão */
 .auction-timer {
     background: linear-gradient(135deg, var(--warning-orange), #f97316);
     color: white;
@@ -91,7 +91,7 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Product Info */
+/* Informações do Produto */
 .product-info {
     display: flex;
     align-items: center;
@@ -135,7 +135,7 @@
     font-size: 0.9rem;
 }
 
-/* Bid Statistics */
+/* Estatísticas dos Lances */
 .bid-stats {
     display: grid;
     grid-template-columns: 1fr;
@@ -180,7 +180,7 @@
     color: var(--warning-orange);
 }
 
-/* Bid Form */
+/* Formulário de Lance */
 .bid-form {
     background: var(--light-bg);
     border-radius: var(--radius);
@@ -228,7 +228,7 @@
     border-color: var(--danger-red);
 }
 
-/* Quick Bid Buttons */
+/* Botões de Lance Rápido */
 .quick-bid-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -267,7 +267,7 @@
     box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
-/* Balance Info */
+/* Informações de Saldo */
 .balance-info {
     background: var(--white-bg);
     border: 1px solid var(--border-light);
@@ -293,7 +293,7 @@
     background: rgba(220, 38, 38, 0.05);
 }
 
-/* Action Buttons */
+/* Botões de Ação */
 .action-buttons {
     display: grid;
     grid-template-columns: 1fr;
@@ -350,7 +350,7 @@
     transform: none;
 }
 
-/* Sidebar Info */
+/* Informações da Barra Lateral */
 .sidebar-info {
     background: var(--white-bg);
     border-radius: var(--radius);
@@ -385,7 +385,7 @@
     font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
-/* Buy Now Section */
+/* Seção Comprar Agora */
 .buy-now-section {
     background: linear-gradient(135deg, var(--success-green), #10b981);
     color: white;
@@ -395,7 +395,7 @@
     margin-top: 1.5rem;
 }
 
-/* Loading Overlay */
+/* Overlay de Carregamento */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -433,7 +433,7 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Alerts */
+/* Alertas */
 .alert {
     border-radius: var(--radius);
     border: none;
@@ -454,7 +454,7 @@
     border-left: 4px solid var(--success-green);
 }
 
-/* Form Feedback */
+/* Feedback do Formulário */
 .form-feedback {
     margin-top: 0.5rem;
     font-size: clamp(0.8rem, 2vw, 0.9rem);
@@ -468,7 +468,7 @@
     color: var(--danger-red);
 }
 
-/* Debug Info */
+/* Informações de Depuração */
 .debug-info {
     background: var(--light-bg);
     border: 1px solid var(--border-light);
@@ -479,7 +479,7 @@
     font-size: 0.85rem;
 }
 
-/* Responsive Layout */
+/* Layout Responsivo Bid*/
 .bid-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -493,7 +493,7 @@
     }
 }
 
-/* Animation Classes */
+/* Classes de Animação */
 .fade-in {
     animation: fadeIn 0.3s ease-in;
 }
@@ -512,7 +512,7 @@
     50% { transform: scale(1.05); }
 }
 
-/* Accessibility */
+/* Acessibilidade */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -521,7 +521,7 @@
     }
 }
 
-/* Focus indicators */
+/* Indicadores de Foco */
 .btn-modern:focus,
 .bid-input:focus,
 .quick-bid-btn:focus {

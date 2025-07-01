@@ -19,19 +19,19 @@ body.rpg-theme {
     background-color: var(--bg-color);
     color: var(--text-color);
     /* Corrigido para caminhos relativos corretos */
-    background-image: url('../images/bg-default.png?v=2');
+    background-image: url('../images/bg-default.png');
     background-attachment: fixed;
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* Full viewport height */
 }
 
-/* Make main content expand to push footer down */
+/* Conteúdo principal expande p/ footer ir p/ baixo */
 main.container {
     flex: 1 0 auto;
 }
 
-/* Footer stays at the bottom */
+/* Footer fica no fundo */
 footer {
     flex-shrink: 0;
     margin-top: auto;
